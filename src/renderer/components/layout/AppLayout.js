@@ -24,10 +24,16 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   FireOutlined,
-  QuestionCircleOutlined
-} from '@ant-design/icons';
-import { logoutUser } from '../../store/slices/authSlice';
+  QuestionCircleOutlined,
+  SecurityScanOutlined,
+  SwapOutlined,
+} from '../../icons/PaperIcons';
+import { signOut, selectUserProfile } from '../../store/slices/authSlice';
 import { setSidebarCollapsed } from '../../store/slices/appSlice';
+import { setShowAccountSwitcher } from '../../store/slices/accountSwitchSlice';
+import authMiddleware from '../../services/authMiddleware';
+import AccountSwitcher from '../AccountSwitcher';
+import '../../styles/AppLayout.css';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -37,8 +43,10 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector(state => state.auth);
+  const userProfile = useSelector(selectUserProfile);
   const { sidebarCollapsed } = useSelector(state => state.app);
-  const [notificationCount] = useState(3); 
+
+ 
 
   const menuItems = [
     {
@@ -77,6 +85,11 @@ const AppLayout = () => {
       label: 'Settings'
     },
     {
+      key: '/security',
+      icon: <SecurityScanOutlined />,
+      label: 'Security Center'
+    },
+    {
       key: '/help',
       icon: <QuestionCircleOutlined />,
       label: 'Help'
@@ -97,6 +110,21 @@ const AppLayout = () => {
       onClick: () => navigate('/settings')
     },
     {
+      key: 'security',
+      icon: <SecurityScanOutlined />,
+      label: 'Security Center',
+      onClick: () => navigate('/security')
+    },
+    {
+      type: 'divider'
+    },
+    {
+      key: 'switch-account',
+      icon: <SwapOutlined />,
+      label: 'Switch Account',
+      onClick: () => dispatch(setShowAccountSwitcher(true))
+    },
+    {
       type: 'divider'
     },
     {
@@ -107,10 +135,16 @@ const AppLayout = () => {
     }
   ];
 
-  function handleLogout() {
-    dispatch(logoutUser());
-    navigate('/login');
-  }
+  const handleLogout = async () => {
+    try {
+      await dispatch(signOut()).unwrap();
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Even if logout fails, redirect to login page
+      navigate('/login', { replace: true });
+    }
+  };
 
   const handleMenuClick = ({ key }) => {
     navigate(key);
@@ -126,28 +160,27 @@ const AppLayout = () => {
   };
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="app-layout">
       {/* Sidebar */}
       <Sider
         trigger={null}
         collapsible
         collapsed={sidebarCollapsed}
-        className="bg-white shadow-lg"
         width={240}
         collapsedWidth={80}
       >
         {/* Logo Area */}
-        <div className="h-16 flex items-center justify-center border-b border-gray-200">
+        <div className="sidebar-logo">
           {sidebarCollapsed ? (
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-              <Text className="text-white font-bold text-lg">N</Text>
+            <div className="logo-collapsed">
+              <Text className="logo-letter">N</Text>
             </div>
           ) : (
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <Text className="text-white font-bold text-lg">N</Text>
+            <div className="logo-expanded">
+              <div className="logo-icon">
+                <Text className="logo-letter">N</Text>
               </div>
-              <Text className="text-xl font-bold text-green-600">NutriHelp</Text>
+              <Text className="logo-text">NutriHelp</Text>
             </div>
           )}
         </div>
@@ -165,36 +198,23 @@ const AppLayout = () => {
 
       <Layout>
         {/* Header */}
-        <Header className="bg-white shadow-sm px-4 flex items-center justify-between">
+        <Header className="px-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button
               type="text"
               icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
               onClick={toggleSidebar}
-              className="text-lg"
+              className="header-toggle-btn"
             />
             <div>
-              <Text className="text-xl font-semibold text-gray-800">
+              <Text className="header-title text-xl font-semibold">
                 {getPageTitle()}
               </Text>
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Notification Bell */}
-            <Tooltip title="Notifications">
-              <Badge count={notificationCount} size="small">
-                <Button
-                  type="text"
-                  icon={<BellOutlined />}
-                  className="text-lg"
-                  onClick={() => {
-                    // Handle notification click
-                    console.log('Show notifications');
-                  }}
-                />
-              </Badge>
-            </Tooltip>
+
 
             {/* User Info */}
             <Dropdown
@@ -202,20 +222,20 @@ const AppLayout = () => {
               placement="bottomRight"
               trigger={['click']}
             >
-              <div className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors">
+              <div className="header-user-section flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg transition-colors">
                 <Avatar
                   size="small"
-                  className="bg-green-600"
+                  className="bg-gray-800"
                   icon={<UserOutlined />}
                 >
-                  {user?.fullName?.charAt(0) || 'U'}
+                  {userProfile?.first_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                 </Avatar>
                 <div className="hidden sm:block">
-                  <Text className="text-sm font-medium text-gray-800">
-                    {user?.fullName || 'User'}
+                  <Text className="header-user-name text-sm font-medium">
+                    {userProfile ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() || 'User' : user?.email || 'User'}
                   </Text>
                   <br />
-                  <Text className="text-xs text-gray-500">
+                  <Text className="header-user-email text-xs">
                     {user?.email || 'user@example.com'}
                   </Text>
                 </div>
@@ -225,10 +245,12 @@ const AppLayout = () => {
         </Header>
 
         {/* Main Content Area */}
-        <Content className="bg-gray-50">
+        <Content>
           <Outlet />
         </Content>
       </Layout>
+      
+      <AccountSwitcher />
     </Layout>
   );
 };

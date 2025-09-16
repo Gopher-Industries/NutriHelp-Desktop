@@ -9,7 +9,8 @@ import {
   PlusOutlined,
   HeartOutlined,
   ThunderboltOutlined
-} from '@ant-design/icons';
+} from '../../../components/icons/PaperIcons';
+import { selectUserProfile } from '../../store/slices/authSlice';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -17,6 +18,7 @@ const { Title, Text } = Typography;
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
+  const userProfile = useSelector(selectUserProfile);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const [dashboardData, setDashboardData] = useState({
@@ -80,11 +82,15 @@ const Dashboard = () => {
           <Col>
             <Space size="large">
               <Avatar size={64} className="bg-green-600">
-                {user?.fullName?.charAt(0) || 'U'}
+                {userProfile && (userProfile.first_name || userProfile.last_name)
+                  ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim().charAt(0)
+                  : (user?.email?.charAt(0) || 'U')}
               </Avatar>
               <div>
                 <Title level={2} className="mb-0">
-                  {getGreeting()}, {user?.fullName || 'User'}!
+                  {getGreeting()}, {userProfile && (userProfile.first_name || userProfile.last_name)
+                    ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim()
+                    : (user?.email || 'User')}!
                 </Title>
                 <Text type="secondary" className="text-lg">
                   Today is {currentTime.toLocaleDateString('en-US', { 

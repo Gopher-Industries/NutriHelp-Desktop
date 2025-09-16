@@ -1,11 +1,36 @@
 /* Register Page Styles */
 .register-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100vh;
+  display: block;
   background: #f7f9fc;
   padding: 20px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.register-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: calc(100vh - 40px);
+}
+
+.register-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.register-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.register-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.register-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .register-card {
@@ -160,15 +185,17 @@
 @media (max-width: 768px) {
   .register-card {
     flex-direction: column;
-    max-width: 400px;
+    max-width: 500px;
+    margin: 0 auto;
   }
   
   .register-content {
-    padding: 40px 24px 24px;
+    padding: 40px 32px 32px;
   }
   
   .register-title {
     font-size: 28px;
+    text-align: center;
   }
   
   .form-row {
@@ -179,18 +206,73 @@
   .register-illustration {
     display: none;
   }
+  
+  .register-company-logo {
+    width: 240px;
+    height: 80px;
+  }
 }
 
 @media (max-width: 480px) {
+  .register-container {
+    padding: 16px;
+    min-height: 100vh;
+  }
+  
+  .register-wrapper {
+    min-height: calc(100vh - 32px);
+  }
+  
+  .register-card {
+    max-width: 100%;
+    border-radius: 16px;
+  }
+  
+  .register-content {
+    padding: 32px 24px 24px;
+  }
+  
+  .register-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .register-company-logo {
+    width: 200px;
+    height: 70px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group .ant-input,
+  .form-group .ant-input-password {
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .register-button {
+    height: 44px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 360px) {
   .register-container {
     padding: 12px;
   }
   
   .register-content {
-    padding: 32px 20px 20px;
+    padding: 24px 16px 16px;
+  }
+  
+  .register-company-logo {
+    width: 180px;
+    height: 60px;
   }
   
   .register-title {
-    font-size: 24px;
+    font-size: 22px;
   }
 }

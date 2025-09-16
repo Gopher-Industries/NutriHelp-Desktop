@@ -84,7 +84,6 @@ const initialState = {
   preferences: {
     theme: 'light',
     language: 'zh-CN',
-    notifications: true,
     autoSync: true,
     dataRetention: 30,
     units: {
@@ -102,7 +101,7 @@ const initialState = {
     error: null
   },
   
-  notifications: [],
+
   
   sidebarCollapsed: false,
   
@@ -133,37 +132,7 @@ const appSlice = createSlice({
       state.sidebarCollapsed = action.payload;
     },
     
-    addNotification: (state, action) => {
-      const notification = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        ...action.payload
-      };
-      state.notifications.unshift(notification);
-      
-      if (state.notifications.length > 50) {
-        state.notifications = state.notifications.slice(0, 50);
-      }
-    },
-    
-    removeNotification: (state, action) => {
-      state.notifications = state.notifications.filter(
-        notification => notification.id !== action.payload
-      );
-    },
-    
-    clearNotifications: (state) => {
-      state.notifications = [];
-    },
-    
-    markNotificationAsRead: (state, action) => {
-      const notification = state.notifications.find(
-        n => n.id === action.payload
-      );
-      if (notification) {
-        notification.read = true;
-      }
-    },
+
     
     setGlobalLoading: (state, action) => {
       state.globalLoading = action.payload;
@@ -245,15 +214,10 @@ export const {
   setCurrentPage,
   toggleSidebar,
   setSidebarCollapsed,
-  addNotification,
-  removeNotification,
-  clearNotifications,
-  markNotificationAsRead,
   setGlobalLoading,
   setGlobalError,
   clearGlobalError,
-  updatePreferences,
-  resetApp
+  updatePreferences
 } = appSlice.actions;
 
 export default appSlice.reducer;
@@ -262,9 +226,7 @@ export const selectIsInitialized = (state) => state.app.isInitialized;
 export const selectIsOnline = (state) => state.app.isOnline;
 export const selectAppInfo = (state) => state.app.appInfo;
 export const selectPreferences = (state) => state.app.preferences;
-export const selectNotifications = (state) => state.app.notifications;
-export const selectUnreadNotifications = (state) => 
-  state.app.notifications.filter(n => !n.read);
+
 export const selectSidebarCollapsed = (state) => state.app.sidebarCollapsed;
 export const selectCurrentPage = (state) => state.app.currentPage;
 export const selectGlobalLoading = (state) => state.app.globalLoading;

@@ -7,13 +7,13 @@ import {
   Button,
   Typography,
   Checkbox,
-  message
+  App
 } from 'antd';
 import {
   EyeInvisibleOutlined,
   EyeTwoTone
-} from '@ant-design/icons';
-import { signIn, clearError, setRememberMe } from '../store/slices/authSlice';
+} from '../../components/icons/PaperIcons';
+import { signIn, clearError, setRememberMe, addLoginHistoryEntry } from '../store/slices/authSlice';
 import '../styles/LoginPage.css';
 
 const { Title } = Typography;
@@ -22,6 +22,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const { message } = App.useApp();
   
   const {
     isLoading,
@@ -51,6 +52,14 @@ const LoginPage = () => {
     };
   }, [dispatch]);
 
+  // Reset loading state on component mount to prevent stuck loading buttons
+  useEffect(() => {
+    if (isLoading && !isAuthenticated) {
+      // If loading is stuck and user is not authenticated, clear the loading state
+      dispatch(clearError());
+    }
+  }, []);
+
   const handleSubmit = async (values) => {
     if (isLocked) {
       message.error('Account is temporarily locked due to multiple failed attempts');
@@ -58,18 +67,36 @@ const LoginPage = () => {
     }
 
     try {
-      const result = await dispatch(signIn({
+      // Use enhanced login with user saving if remember me is checked
+      if (rememberMe) {
+        await dispatch(signIn({
         email: values.email,
         password: values.password
       })).unwrap();
-
-      if (result) {
-        message.success('Login successful!');
-        navigate('/dashboard', { replace: true });
+      } else {
+        await dispatch(signIn({
+          email: values.email,
+          password: values.password
+        })).unwrap();
       }
+      
+      // Add successful login to history
+      dispatch(addLoginHistoryEntry({
+        success: true,
+        email: values.email
+      }));
+      
+      message.success('Login successful!');
+      navigate('/dashboard', { replace: true });
     } catch (error) {
+      // Add failed login to history
+      dispatch(addLoginHistoryEntry({
+        success: false,
+        email: values.email
+      }));
+      
       console.error('Login error:', error);
-      message.error(error || 'Login failed. Please try again.');
+      message.error(error?.message || error || 'Login failed. Please try again.');
     }
   };
 
@@ -84,7 +111,18 @@ const LoginPage = () => {
   const isFormValid = formData.email && formData.password;
 
   return (
-    <div className="login-container">
+    <div className="login-container" style={{
+      overflowY: 'auto',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none'
+    }}>
+      <style>
+        {`
+          .login-container::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
       <div className="login-card">
         <div className="login-content">
           <div className="login-company-logo-section">
@@ -183,6 +221,8 @@ const LoginPage = () => {
               Not registered yet? <Link to="/register" className="signup-link">Create an Account</Link>
             </span>
           </div>
+          
+
         </div>
         
         <div className="login-illustration">

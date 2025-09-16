@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Layout,
   Card,
@@ -11,29 +11,43 @@ import {
   Typography,
   Space,
   Dropdown,
-  Badge,
-  Progress,
-  Statistic,
-  message,
-  Tooltip
+  App,
+  Tooltip,
+  Badge
 } from 'antd';
 import {
   UserOutlined,
-  BellOutlined,
   SettingOutlined,
   LogoutOutlined,
-  PlusOutlined,
-  FireOutlined,
   ExperimentOutlined,
   ThunderboltOutlined,
   HeartOutlined,
-  TrophyOutlined,
   CalendarOutlined,
   BarChartOutlined,
-  RightOutlined,
-  StarOutlined
-} from '@ant-design/icons';
+  BellOutlined,
+  DashboardOutlined,
+  SecurityScanOutlined,
+  RobotOutlined,
+  LineChartOutlined,
+  BookOutlined,
+  TeamOutlined,
+  FileTextOutlined,
+  SwapOutlined
+} from '../../components/icons/PaperIcons';
 import { signOut } from '../store/slices/authSlice';
+import { setShowAccountSwitcher } from '../store/slices/accountSwitchSlice';
+import authMiddleware from '../services/authMiddleware';
+import SecurityCenterPage from './SecurityCenterPage';
+import ProfilePage from './ProfilePage';
+import AccountSwitcher from '../components/AccountSwitcher';
+import {
+  getUnreadCount,
+  selectUnreadCount,
+  refreshForAccountSwitch,
+  fetchNotifications
+} from '../store/slices/notificationSlice';
+import { selectUserProfile, fetchUserProfile } from '../store/slices/authSlice';
+import { selectGeneralSettings } from '../store/slices/settingsSlice';
 import '../styles/DashboardPage.css';
 
 const { Header, Content } = Layout;
@@ -42,44 +56,86 @@ const { Title, Text } = Typography;
 const DashboardPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const { user } = useSelector(state => state.auth);
+  const userProfile = useSelector(selectUserProfile);
+  const unreadCount = useSelector(selectUnreadCount);
+  const generalSettings = useSelector(selectGeneralSettings);
+  const userRole = userProfile?.role;
+
   const [currentTime, setCurrentTime] = useState(new Date());
+  const { message } = App.useApp();
 
-  // Mock data for demonstration
-  const [dashboardData] = useState({
-    todayCalories: 1850,
-    targetCalories: 2200,
-    protein: 85,
-    targetProtein: 120,
-    carbs: 220,
-    targetCarbs: 275,
-    fat: 65,
-    targetFat: 73,
-    water: 6,
-    targetWater: 8,
-    weight: 70.5,
-    targetWeight: 68.0,
-    streak: 7,
-    weeklyGoal: 85
-  });
-
-  const [todayMeals] = useState([
-    { name: 'Avocado Toast', time: '08:30', calories: 320, type: 'breakfast' },
-    { name: 'Greek Salad', time: '12:45', calories: 450, type: 'lunch' },
-    { name: 'Protein Smoothie', time: '15:30', calories: 280, type: 'snack' }
-  ]);
-
-  const [quickActions] = useState([
-    { icon: <PlusOutlined />, title: 'Log Meal', color: '#52c41a', path: '/add-meal' },
-    { icon: <ExperimentOutlined />, title: 'Add Water', color: '#1890ff', path: '/water' },
-    { icon: <BarChartOutlined />, title: 'View Reports', color: '#722ed1', path: '/reports' },
-    { icon: <CalendarOutlined />, title: 'Meal Plan', color: '#fa8c16', path: '/meal-plan' }
+  const [coreModules] = useState([
+    {
+      id: 'nutrition-analysis',
+      title: 'Nutrition Analysis',
+      description: 'Food Database, Nutrition Tracking, Reports',
+      icon: <BarChartOutlined />,
+      path: '/nutrition-analysis',
+      features: ['Food Nutrition Query', 'Meal Nutrition Analysis', 'Nutrition Intake Tracking', 'Nutrition Report Generation']
+    },
+    {
+      id: 'meal-planning',
+      title: 'Meal Planning',
+      description: 'Personalized Plans, Recipes, Shopping Lists',
+      icon: <CalendarOutlined />,
+      path: '/meal-planning',
+      features: ['Personalized Meal Plans', 'Recipe Recommendations', 'Shopping List Generation', 'Meal Calendar']
+    },
+    {
+      id: 'health-monitoring',
+      title: 'Health Monitoring',
+      description: 'Weight Tracking, Health Metrics, Progress',
+      icon: <HeartOutlined />,
+      path: '/health-monitoring',
+      features: ['Weight Tracking', 'Health Indicator Recording', 'Progress Visualization', 'Health Recommendations']
+    },
+    {
+      id: 'smart-assistant',
+      title: 'Smart Assistant',
+      description: 'AI Consultation, Personalized Advice, Q&A',
+      icon: <RobotOutlined />,
+      path: '/smart-assistant',
+      features: ['AI Nutrition Consultation', 'Personalized Recommendations', 'Health Reminders', 'Q&A System']
+    },
+    {
+      id: 'reports-analytics',
+      title: 'Reports & Analytics',
+      description: 'Data Insights, Trends, Performance',
+      icon: <LineChartOutlined />,
+      path: '/reports',
+      features: ['Comprehensive Reports', 'Trend Analysis', 'Performance Metrics', 'Data Export']
+    }
   ]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (user && !userProfile) {
+      dispatch(fetchUserProfile());
+    }
+  }, [user, userProfile, dispatch]);
+
+  useEffect(() => {
+    if (user && userRole && userRole !== 'admin') {
+      dispatch(getUnreadCount());
+    }
+  }, [user, userRole, dispatch]);
+
+  useEffect(() => {
+    if (user && userRole && userRole !== 'admin') {
+      dispatch(refreshForAccountSwitch());
+      dispatch(getUnreadCount());
+    }
+  }, [user?.id, userRole, dispatch]);
+
+
+
+
 
   const handleLogout = async () => {
     try {
@@ -91,12 +147,58 @@ const DashboardPage = () => {
     }
   };
 
+  const handleNotificationClick = () => {
+    if (userRole === 'admin') {
+      navigate('/admin/notifications');
+    } else {
+      navigate('/notifications');
+    }
+  };
+
   const userMenuItems = [
     {
-      key: 'profile',
+      key: '/dashboard',
+      icon: <DashboardOutlined />,
+      label: 'Dashboard',
+      onClick: () => navigate('/dashboard')
+    },
+    {
+      type: 'divider'
+    },
+    {
+      key: '/profile',
       icon: <UserOutlined />,
-      label: 'Profile',
+      label: 'Personal Profile Management',
       onClick: () => navigate('/profile')
+    },
+    {
+      key: '/health-records',
+      icon: <HeartOutlined />,
+      label: 'Health Records Setup',
+      onClick: () => navigate('/health-records')
+    },
+    {
+      key: '/security',
+      icon: <SecurityScanOutlined />,
+      label: 'Security',
+      onClick: () => navigate('/security')
+    },
+    ...(userRole === 'admin' ? [
+      {
+        key: '/admin/notifications',
+        icon: <BellOutlined />,
+        label: 'Notification Management',
+        onClick: () => navigate('/admin/notifications')
+      }
+    ] : []),
+    {
+      type: 'divider'
+    },
+    {
+      key: 'switch-account',
+      icon: <SwapOutlined />,
+      label: 'Switch Account',
+      onClick: () => dispatch(setShowAccountSwitcher(true))
     },
     {
       key: 'settings',
@@ -115,84 +217,307 @@ const DashboardPage = () => {
     }
   ];
 
+
+
+  const handleMenuClick = ({ key }) => {
+    navigate(key);
+  };
+
   const getGreeting = () => {
+    const { language = 'en' } = generalSettings;
     const hour = currentTime.getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    
+    const greetings = {
+      'en': {
+        morning: 'Good Morning',
+        afternoon: 'Good Afternoon', 
+        evening: 'Good Evening'
+      },
+      'es': {
+        morning: 'Buenos Días',
+        afternoon: 'Buenas Tardes',
+        evening: 'Buenas Noches'
+      },
+      'fr': {
+        morning: 'Bonjour',
+        afternoon: 'Bon Après-midi',
+        evening: 'Bonsoir'
+      },
+      'de': {
+        morning: 'Guten Morgen',
+        afternoon: 'Guten Tag',
+        evening: 'Guten Abend'
+      },
+      'zh': {
+        morning: 'Good Morning',
+    afternoon: 'Good Afternoon',
+    evening: 'Good Evening'
+      },
+      'ja': {
+        morning: 'おはようございます',
+        afternoon: 'こんにちは',
+        evening: 'こんばんは'
+      }
+    };
+    
+    const langGreetings = greetings[language] || greetings['en'];
+    
+    if (hour < 12) return langGreetings.morning;
+    if (hour < 17) return langGreetings.afternoon;
+    return langGreetings.evening;
   };
 
-  const getCalorieProgress = () => {
-    return Math.round((dashboardData.todayCalories / dashboardData.targetCalories) * 100);
+  const renderDashboardContent = () => {
+    return (
+      <div className="dashboard-container">
+        <div className="particles-background">
+          {[...Array(20)].map((_, i) => (
+            <div 
+              key={i} 
+              className={`particle particle-${i + 1}`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 10}s`,
+                animationDuration: `${8 + Math.random() * 12}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        <div className="welcome-section">
+          <Title level={1} className="welcome-title">
+            NutriHelp Dashboard
+          </Title>
+          <Text className="welcome-subtitle">
+            Your Gateway to Comprehensive Nutrition Management
+          </Text>
+        </div>
+
+        <div className="futuristic-modules-container">
+          <div className="modules-hexagon-grid">
+            {coreModules.map((module, index) => (
+              <div 
+                key={module.id}
+                className={`hexagon-module hexagon-module-${index + 1}`}
+                onClick={() => navigate(module.path)}
+              >
+                <div className="hexagon-inner">
+                  <div className="hexagon-content">
+                    <div className="module-icon-futuristic">
+                      {module.icon}
+                      <div className="icon-glow"></div>
+                    </div>
+                    <div className="module-title-futuristic">
+                      {module.title}
+                    </div>
+                    <div className="module-subtitle">
+                      {module.description}
+                    </div>
+                    <div className="feature-count">
+                      {module.features.length} Features
+                    </div>
+                    <div className="hover-overlay">
+                      <div className="feature-preview">
+                        {module.features.slice(0, 2).map((feature, idx) => (
+                          <div key={idx} className="feature-preview-item">
+                            <span className="feature-bullet">●</span>
+                            {feature}
+                          </div>
+                        ))}
+                        {module.features.length > 2 && (
+                          <div className="more-features">
+                            +{module.features.length - 2} more
+                          </div>
+                        )}
+                      </div>
+                      <div className="explore-arrow">→</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="hexagon-border"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+
+      </div>
+    );
   };
 
-  const getMacroProgress = (current, target) => {
-    return Math.round((current / target) * 100);
+  const renderPageContent = () => {
+    switch (location.pathname) {
+      case '/profile':
+        return <ProfilePage />;
+      case '/security':
+        return <SecurityCenterPage />;
+      default:
+        return renderDashboardContent();
+    }
   };
+
+
 
   const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', { 
+    const { language = 'en', timeFormat = '12h' } = generalSettings;
+    
+    const localeMap = {
+      'en': 'en-US',
+      'es': 'es-ES', 
+      'fr': 'fr-FR',
+      'de': 'de-DE',
+      'zh': 'zh-CN',
+      'ja': 'ja-JP'
+    };
+    
+    const locale = localeMap[language] || 'en-US';
+    const hour12 = timeFormat === '12h';
+    
+    return date.toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit',
-      hour12: false 
+      hour12: hour12
     });
   };
 
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const { language = 'en', dateFormat = 'MM/DD/YYYY', firstDayOfWeek = 0 } = generalSettings;
+    
+    const localeMap = {
+      'en': 'en-US',
+      'es': 'es-ES', 
+      'fr': 'fr-FR',
+      'de': 'de-DE',
+      'zh': 'zh-CN',
+      'ja': 'ja-JP'
+    };
+    
+    const locale = localeMap[language] || 'en-US';
+    
+    if (dateFormat === 'DD/MM/YYYY') {
+      return date.toLocaleDateString(locale, { 
+        weekday: 'long',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } else if (dateFormat === 'YYYY-MM-DD') {
+      return date.toLocaleDateString(locale, { 
+        weekday: 'long',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } else if (dateFormat === 'MMM DD, YYYY') {
+      return date.toLocaleDateString(locale, { 
+        weekday: 'long',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } else {
+      return date.toLocaleDateString(locale, { 
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
   };
+
+  const formatCurrency = (amount) => {
+    const { language = 'en', currency = 'USD' } = generalSettings;
+    
+    const localeMap = {
+      'en': 'en-US',
+      'es': 'es-ES', 
+      'fr': 'fr-FR',
+      'de': 'de-DE',
+      'zh': 'zh-CN',
+      'ja': 'ja-JP'
+    };
+    
+    const locale = localeMap[language] || 'en-US';
+    
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency
+    }).format(amount);
+  };
+
+
 
   return (
     <Layout className="modern-dashboard">
-      <Header className="modern-header">
+      <style>
+        {`
+          .modern-content::-webkit-scrollbar {
+            display: none;
+          }
+          .modern-content {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            overflow-y: auto;
+          }
+        `}
+      </style>
+      <Header className="dashboard-header">
         <div className="header-content">
-          <div className="brand-section">
-            <div className="brand-icon">
-              <span>🥗</span>
+          <div className="header-left">
+            <div className="brand-section">
+              <img 
+                src={require('../assets/images/dashboard_page/logo.png')} 
+                alt="Logo" 
+                className="brand-logo-img"
+              />
             </div>
-            <Title level={4} className="brand-title">NutriHelp</Title>
           </div>
           
-          <div className="header-actions">
-            <Space size="large">
-              <div className="time-display">
-                <Text className="current-time">{formatTime(currentTime)}</Text>
-                <Text className="current-date">{formatDate(currentTime)}</Text>
-              </div>
-              
+          <div className="header-center">
+            <div className="time-display" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+              <Typography.Text className="current-time" style={{ letterSpacing: '0.5px', fontWeight: 500 }}>
+                {formatTime(currentTime)}
+              </Typography.Text>
+              <Typography.Text className="current-date" style={{ letterSpacing: '0.3px', fontSize: '12px' }}>
+                {formatDate(currentTime)}
+              </Typography.Text>
+            </div>
+          </div>
+          
+          <div className="header-right">
+            <Space size="medium">
               <Tooltip title="Notifications">
-                <Badge count={3} size="small">
-                  <Button 
-                    type="text" 
-                    icon={<BellOutlined />} 
-                    className="action-btn"
+                <Badge count={userRole === 'admin' ? 0 : unreadCount} size="small">
+                  <Button
+                    type="text"
+                    icon={<BellOutlined />}
+                    onClick={handleNotificationClick}
+                    style={{
+                      color: '#fff',
+                      fontSize: '16px',
+                      height: '40px',
+                      width: '40px'
+                    }}
                   />
                 </Badge>
               </Tooltip>
               
-              <Dropdown
-                menu={{ items: userMenuItems }}
-                placement="bottomRight"
-                trigger={['click']}
-              >
-                <div className="user-profile">
-                  <Avatar 
-                    size={40} 
-                    icon={<UserOutlined />} 
-                    className="user-avatar"
-                  />
-                  <div className="user-details">
-                    <Text className="user-name">
-                      {user?.user_metadata?.firstName || 'User'}
-                    </Text>
-                    <Text className="user-status">Premium Member</Text>
-                  </div>
-                </div>
+              <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
+                <Button type="text" className="user-profile-btn">
+                  <Space>
+                    <Avatar 
+                      size="small" 
+                      icon={<UserOutlined />} 
+                      className="user-avatar"
+                    />
+                    <Typography.Text className="username">
+                      {userProfile && (userProfile.first_name || userProfile.last_name) 
+                        ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() 
+                        : user?.email || 'User'}
+                    </Typography.Text>
+                  </Space>
+                </Button>
               </Dropdown>
             </Space>
           </div>
@@ -200,228 +525,10 @@ const DashboardPage = () => {
       </Header>
 
       <Content className="modern-content">
-        <div className="dashboard-container">
-          {/* Hero Section */}
-          <div className="hero-section">
-            <div className="hero-content">
-              <div className="greeting-section">
-                <Title level={1} className="greeting-title">
-                  {getGreeting()}, {user?.user_metadata?.firstName || 'User'}!
-                </Title>
-                <Text className="greeting-subtitle">
-                  Ready to crush your nutrition goals today?
-                </Text>
-              </div>
-              
-              <div className="daily-overview">
-                <div className="overview-card calories-overview">
-                  <div className="overview-icon">
-                    <FireOutlined />
-                  </div>
-                  <div className="overview-content">
-                    <Text className="overview-label">Calories Today</Text>
-                    <Title level={2} className="overview-value">
-                      {dashboardData.todayCalories}
-                      <span className="overview-target">/{dashboardData.targetCalories}</span>
-                    </Title>
-                    <Progress 
-                      percent={getCalorieProgress()} 
-                      strokeColor="#ff6b35"
-                      trailColor="rgba(255, 107, 53, 0.1)"
-                      strokeWidth={6}
-                      showInfo={false}
-                    />
-                  </div>
-                </div>
-                
-                <div className="overview-card water-overview">
-                  <div className="overview-icon">
-                    <ExperimentOutlined />
-                  </div>
-                  <div className="overview-content">
-                    <Text className="overview-label">Water Intake</Text>
-                    <Title level={2} className="overview-value">
-                      {dashboardData.water}
-                      <span className="overview-target">/{dashboardData.targetWater} glasses</span>
-                    </Title>
-                    <Progress 
-                      percent={getMacroProgress(dashboardData.water, dashboardData.targetWater)} 
-                      strokeColor="#1890ff"
-                      trailColor="rgba(24, 144, 255, 0.1)"
-                      strokeWidth={6}
-                      showInfo={false}
-                    />
-                  </div>
-                </div>
-                
-                <div className="overview-card streak-overview">
-                  <div className="overview-icon">
-                    <TrophyOutlined />
-                  </div>
-                  <div className="overview-content">
-                    <Text className="overview-label">Current Streak</Text>
-                    <Title level={2} className="overview-value">
-                      {dashboardData.streak}
-                      <span className="overview-target">days</span>
-                    </Title>
-                    <div className="streak-indicator">
-                      <StarOutlined className="streak-star" />
-                      <Text className="streak-text">Amazing progress!</Text>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="quick-actions-section">
-            <Title level={3} className="section-title">Quick Actions</Title>
-            <Row gutter={[16, 16]}>
-              {quickActions.map((action, index) => (
-                <Col xs={12} sm={6} key={index}>
-                  <Card 
-                    className="action-card"
-                    hoverable
-                    onClick={() => navigate(action.path)}
-                  >
-                    <div className="action-content">
-                      <div 
-                        className="action-icon"
-                        style={{ backgroundColor: `${action.color}15`, color: action.color }}
-                      >
-                        {action.icon}
-                      </div>
-                      <Text className="action-title">{action.title}</Text>
-                    </div>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </div>
-
-          {/* Main Content Grid */}
-          <Row gutter={[24, 24]} className="main-grid">
-            {/* Macronutrients */}
-            <Col xs={24} lg={12}>
-              <Card className="macro-card" title="Macronutrients">
-                <div className="macro-grid">
-                  <div className="macro-item protein">
-                    <div className="macro-header">
-                      <ThunderboltOutlined className="macro-icon" />
-                      <Text className="macro-name">Protein</Text>
-                    </div>
-                    <div className="macro-progress">
-                      <Text className="macro-value">
-                        {dashboardData.protein}g / {dashboardData.targetProtein}g
-                      </Text>
-                      <Progress 
-                        percent={getMacroProgress(dashboardData.protein, dashboardData.targetProtein)}
-                        strokeColor="#52c41a"
-                        trailColor="rgba(82, 196, 26, 0.1)"
-                        strokeWidth={8}
-                        showInfo={false}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="macro-item carbs">
-                    <div className="macro-header">
-                      <HeartOutlined className="macro-icon" />
-                      <Text className="macro-name">Carbs</Text>
-                    </div>
-                    <div className="macro-progress">
-                      <Text className="macro-value">
-                        {dashboardData.carbs}g / {dashboardData.targetCarbs}g
-                      </Text>
-                      <Progress 
-                        percent={getMacroProgress(dashboardData.carbs, dashboardData.targetCarbs)}
-                        strokeColor="#faad14"
-                        trailColor="rgba(250, 173, 20, 0.1)"
-                        strokeWidth={8}
-                        showInfo={false}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="macro-item fat">
-                    <div className="macro-header">
-                      <ExperimentOutlined className="macro-icon" />
-                      <Text className="macro-name">Fat</Text>
-                    </div>
-                    <div className="macro-progress">
-                      <Text className="macro-value">
-                        {dashboardData.fat}g / {dashboardData.targetFat}g
-                      </Text>
-                      <Progress 
-                        percent={getMacroProgress(dashboardData.fat, dashboardData.targetFat)}
-                        strokeColor="#f759ab"
-                        trailColor="rgba(247, 89, 171, 0.1)"
-                        strokeWidth={8}
-                        showInfo={false}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </Col>
-
-            {/* Today's Meals */}
-            <Col xs={24} lg={12}>
-              <Card 
-                className="meals-card" 
-                title="Today's Meals"
-                extra={
-                  <Button 
-                    type="primary" 
-                    icon={<PlusOutlined />}
-                    className="add-meal-btn"
-                    onClick={() => navigate('/add-meal')}
-                  >
-                    Add Meal
-                  </Button>
-                }
-              >
-                <div className="meals-list">
-                  {todayMeals.map((meal, index) => (
-                    <div key={index} className="meal-item">
-                      <div className="meal-info">
-                        <div className="meal-header">
-                          <Text className="meal-name">{meal.name}</Text>
-                          <Text className="meal-time">{meal.time}</Text>
-                        </div>
-                        <div className="meal-details">
-                          <Text className="meal-calories">{meal.calories} cal</Text>
-                          <div className={`meal-type ${meal.type}`}>
-                            {meal.type}
-                          </div>
-                        </div>
-                      </div>
-                      <Button 
-                        type="text" 
-                        icon={<RightOutlined />} 
-                        className="meal-action"
-                      />
-                    </div>
-                  ))}
-                  
-                  {todayMeals.length === 0 && (
-                    <div className="empty-meals">
-                      <Text type="secondary">No meals logged today</Text>
-                      <Button 
-                        type="link" 
-                        onClick={() => navigate('/add-meal')}
-                      >
-                        Add your first meal
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            </Col>
-          </Row>
-        </div>
+        {renderPageContent()}
       </Content>
+      
+      <AccountSwitcher />
     </Layout>
   );
 };

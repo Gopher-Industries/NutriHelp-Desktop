@@ -42,18 +42,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => window.removeEventListener('offline', callback);
   },
 
-  showNotification: (title, options) => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      return new Notification(title, options);
-    }
-    return null;
-  },
-  requestNotificationPermission: () => {
-    if ('Notification' in window) {
-      return Notification.requestPermission();
-    }
-    return Promise.resolve('denied');
-  },
+
 
   writeToClipboard: (text) => ipcRenderer.invoke('clipboard-write-text', text),
   readFromClipboard: () => ipcRenderer.invoke('clipboard-read-text'),
@@ -73,15 +62,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
   isDev: () => ipcRenderer.invoke('is-dev')
 });
 
+// Always expose necessary environment variables for Supabase
+contextBridge.exposeInMainWorld('nodeAPI', {
+  process: {
+    env: {
+      // Expose only necessary environment variables
+      REACT_APP_SUPABASE_URL: process.env.REACT_APP_SUPABASE_URL || '',
+      REACT_APP_SUPABASE_ANON_KEY: process.env.REACT_APP_SUPABASE_ANON_KEY || '',
+      REACT_APP_USE_MOCK_DATA: process.env.REACT_APP_USE_MOCK_DATA || 'false',
+      REACT_APP_ENVIRONMENT: process.env.REACT_APP_ENVIRONMENT || 'development',
+      NODE_ENV: process.env.NODE_ENV || 'development',
+      // Additional environment variables
+      REACT_APP_NAME: process.env.REACT_APP_NAME || '',
+      REACT_APP_VERSION: process.env.REACT_APP_VERSION || '',
+      REACT_APP_DEV_MODE: process.env.REACT_APP_DEV_MODE || 'false',
+      REACT_APP_DEBUG: process.env.REACT_APP_DEBUG || 'false',
+      REACT_APP_LOG_LEVEL: process.env.REACT_APP_LOG_LEVEL || 'info'
+    },
+    platform: process.platform,
+    arch: process.arch,
+    version: process.version
+  }
+});
+
+// Debug logging for environment variables
 if (process.env.NODE_ENV === 'development') {
-  contextBridge.exposeInMainWorld('nodeAPI', {
-    process: {
-      env: process.env,
-      platform: process.platform,
-      arch: process.arch,
-      version: process.version
-    }
-  });
+  console.log('Preload environment check:');
+  console.log('- REACT_APP_SUPABASE_URL:', process.env.REACT_APP_SUPABASE_URL ? 'Set' : 'Not set');
+  console.log('- REACT_APP_SUPABASE_ANON_KEY:', process.env.REACT_APP_SUPABASE_ANON_KEY ? 'Set' : 'Not set');
+  console.log('- REACT_APP_USE_MOCK_DATA:', process.env.REACT_APP_USE_MOCK_DATA);
 }
 
 window.addEventListener('DOMContentLoaded', () => {

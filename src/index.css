@@ -1,17 +1,18 @@
-/* 全局样式重置 */
+/* Global style reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* 根元素样式 */
+/* Root element styles */
 html {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow: hidden;
 }
 
 body {
@@ -20,30 +21,35 @@ body {
     sans-serif;
   background-color: #f5f5f5;
   color: #333;
+  overflow: hidden;
+  height: 100vh;
 }
 
-/* 滚动条样式 */
+/* Scrollbar styles */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 0px;
+  height: 0px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-  transition: background 0.2s ease;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: transparent;
 }
 
-/* 选择文本样式 */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Text selection styles */
 ::selection {
   background-color: #52c41a;
   color: white;
@@ -67,7 +73,7 @@ body {
   color: white;
 }
 
-/* 链接样式 */
+/* Link styles */
 a {
   color: #1890ff;
   text-decoration: none;
@@ -82,7 +88,7 @@ a:active {
   color: #096dd9;
 }
 
-/* 按钮基础样式 */
+/* Basic button styles */
 button {
   cursor: pointer;
   border: none;
@@ -95,26 +101,26 @@ button:disabled {
   opacity: 0.6;
 }
 
-/* 输入框基础样式 */
+/* Basic input styles */
 input, textarea, select {
   outline: none;
   transition: all 0.2s ease;
 }
 
-/* 图片样式 */
+/* Image styles */
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* 表格样式 */
+/* Table styles */
 table {
   border-collapse: collapse;
   width: 100%;
 }
 
-/* 代码样式 */
+/* Code styles */
 code {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   background-color: #f6f8fa;
@@ -136,7 +142,7 @@ pre code {
   padding: 0;
 }
 
-/* 工具类 */
+/* Utility classes */
 .text-center {
   text-align: center;
 }
@@ -214,7 +220,7 @@ pre code {
   position: sticky;
 }
 
-/* 间距工具类 */
+/* Spacing utility classes */
 .m-0 { margin: 0; }
 .m-1 { margin: 4px; }
 .m-2 { margin: 8px; }
@@ -295,7 +301,7 @@ pre code {
 .pr-5 { padding-right: 20px; }
 .pr-6 { padding-right: 24px; }
 
-/* 颜色工具类 */
+/* Color utility classes */
 .text-primary { color: #1890ff; }
 .text-success { color: #52c41a; }
 .text-warning { color: #faad14; }
@@ -314,7 +320,7 @@ pre code {
 .bg-white { background-color: #ffffff; }
 .bg-dark { background-color: #333333; }
 
-/* 字体大小工具类 */
+/* Font size utility classes */
 .text-xs { font-size: 0.75rem; }
 .text-sm { font-size: 0.875rem; }
 .text-base { font-size: 1rem; }
@@ -323,7 +329,7 @@ pre code {
 .text-2xl { font-size: 1.5rem; }
 .text-3xl { font-size: 1.875rem; }
 
-/* 字体粗细工具类 */
+/* Font weight utility classes */
 .font-thin { font-weight: 100; }
 .font-light { font-weight: 300; }
 .font-normal { font-weight: 400; }
@@ -333,7 +339,7 @@ pre code {
 .font-extrabold { font-weight: 800; }
 .font-black { font-weight: 900; }
 
-/* 圆角工具类 */
+/* Border radius utility classes */
 .rounded-none { border-radius: 0; }
 .rounded-sm { border-radius: 2px; }
 .rounded { border-radius: 4px; }
@@ -343,7 +349,7 @@ pre code {
 .rounded-2xl { border-radius: 16px; }
 .rounded-full { border-radius: 50%; }
 
-/* 阴影工具类 */
+/* Shadow utility classes */
 .shadow-none { box-shadow: none; }
 .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
 .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
@@ -351,13 +357,13 @@ pre code {
 .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
 .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
 
-/* 过渡动画 */
+/* Transition animations */
 .transition-all { transition: all 0.2s ease; }
 .transition-colors { transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease; }
 .transition-opacity { transition: opacity 0.2s ease; }
 .transition-transform { transition: transform 0.2s ease; }
 
-/* 悬停效果 */
+/* Hover effects */
 .hover-scale:hover {
   transform: scale(1.05);
 }
@@ -366,7 +372,7 @@ pre code {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* 响应式工具类 */
+/* Responsive utility classes */
 @media (max-width: 768px) {
   .mobile-hidden {
     display: none;
@@ -395,7 +401,7 @@ pre code {
   }
 }
 
-/* 自定义动画 */
+/* Custom animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -445,7 +451,7 @@ pre code {
   }
 }
 
-/* 动画类 */
+/* Animation classes */
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in-out;
 }
@@ -466,7 +472,7 @@ pre code {
   animation: spin 1s linear infinite;
 }
 
-/* 打印样式 */
+/* Print styles */
 @media print {
   .no-print {
     display: none !important;
@@ -483,7 +489,7 @@ pre code {
   }
 }
 
-/* 高对比度模式支持 */
+/* High contrast mode support */
 @media (prefers-contrast: high) {
   body {
     background: white;
@@ -499,7 +505,7 @@ pre code {
   }
 }
 
-/* 减少动画偏好支持 */
+/* Reduced motion preference support */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

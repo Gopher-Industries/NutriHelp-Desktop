@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Button } from 'antd';
@@ -8,19 +8,27 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
       navigate('/login');
     }
-  }, [isAuthenticated, navigate]);
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  };
 
   return (
-    <div className="home-container">
-      {/* Hero Section */}
+    <div className="home-container" style={{
+      overflowY: 'auto',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none'
+    }}>
+      <style>
+        {`
+          .home-container::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
       <section className="hero-section">
         <div className="hero-content">
           <div className="hero-text">
@@ -32,8 +40,13 @@ const HomePage = () => {
               Your personal nutrition assistant powered by AI. Get personalized meal plans, 
               track your nutrition, and achieve your health goals with expert guidance.
             </p>
-            <Button type="primary" size="large" className="hero-button">
-              GET STARTED
+            <Button 
+              type="primary" 
+              size="large" 
+              className="hero-button"
+              onClick={handleGetStarted}
+            >
+              {isAuthenticated ? 'GO TO DASHBOARD' : 'GET STARTED'}
             </Button>
           </div>
           <div className="hero-image">
@@ -42,7 +55,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="features-section">
         <div className="features-container">
           <div className="feature-item">
@@ -103,7 +115,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Services Section */}
       <section className="services-section">
         <div className="services-container">
           <h2 className="services-title">Services</h2>
@@ -151,7 +162,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section className="contact-section">
         <div className="contact-container">
           <h2 className="contact-title">Contact</h2>
@@ -171,7 +181,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Newsletter Section */}
       <section className="newsletter-section">
         <div className="newsletter-container">
           <h2 className="newsletter-title">Subscribe to our Newsletter</h2>
@@ -183,7 +192,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-content">

@@ -170,31 +170,7 @@ const initialState = {
     healthReminders: true,
   },
   
-  notifications: {
-    enabled: true,
-    mealReminders: true,
-    waterReminders: true,
-    medicationReminders: false,
-    workoutReminders: false,
-    goalAchievements: true,
-    weeklyReports: true,
-    systemUpdates: true,
-    marketingEmails: false,
-    pushNotifications: true,
-    emailNotifications: false,
-    smsNotifications: false,
-    reminderTimes: {
-      breakfast: '08:00',
-      lunch: '12:00',
-      dinner: '18:00',
-      water: ['09:00', '12:00', '15:00', '18:00'],
-    },
-    quietHours: {
-      enabled: true,
-      start: '22:00',
-      end: '07:00',
-    },
-  },
+
   
   privacy: {
     dataCollection: 'minimal',
@@ -365,11 +341,7 @@ const settingsSlice = createSlice({
       state.lastUpdated = new Date().toISOString();
     },
     
-    updateNotificationSettings: (state, action) => {
-      state.notifications = { ...state.notifications, ...action.payload };
-      state.hasUnsavedChanges = true;
-      state.lastUpdated = new Date().toISOString();
-    },
+
     
     updatePrivacySettings: (state, action) => {
       state.privacy = { ...state.privacy, ...action.payload };
@@ -438,16 +410,7 @@ const settingsSlice = createSlice({
       state.hasUnsavedChanges = true;
     },
     
-    toggleNotifications: (state) => {
-      state.notifications.enabled = !state.notifications.enabled;
-      state.hasUnsavedChanges = true;
-    },
-    
-    updateReminderTime: (state, action) => {
-      const { meal, time } = action.payload;
-      state.notifications.reminderTimes[meal] = time;
-      state.hasUnsavedChanges = true;
-    },
+
     
     addIntegration: (state, action) => {
       const { type, integration } = action.payload;
@@ -647,7 +610,7 @@ export const {
   updateMealPlanningSettings,
   updateRecipeSettings,
   updateHealthSettings,
-  updateNotificationSettings,
+
   updatePrivacySettings,
   updateSyncSettings,
   updateDisplaySettings,
@@ -659,8 +622,7 @@ export const {
   updateSingleSetting,
   setTheme,
   setLanguage,
-  toggleNotifications,
-  updateReminderTime,
+
   addIntegration,
   removeIntegration,
   addFavoriteFeature,
@@ -690,7 +652,7 @@ export const selectNutritionSettings = (state) => state.settings.nutrition;
 export const selectMealPlanningSettings = (state) => state.settings.mealPlanning;
 export const selectRecipeSettings = (state) => state.settings.recipes;
 export const selectHealthSettings = (state) => state.settings.health;
-export const selectNotificationSettings = (state) => state.settings.notifications;
+
 export const selectPrivacySettings = (state) => state.settings.privacy;
 export const selectSyncSettings = (state) => state.settings.sync;
 export const selectDisplaySettings = (state) => state.settings.display;
@@ -704,4 +666,7 @@ export const selectLanguage = (state) => state.settings.general.language;
 export const selectHasUnsavedChanges = (state) => state.settings.hasUnsavedChanges;
 export const selectIsLoading = (state) => state.settings.isLoading;
 export const selectIsSaving = (state) => state.settings.isSaving;
+export const selectIsExporting = (state) => state.settings.isExporting;
+export const selectIsImporting = (state) => state.settings.isImporting;
+export const selectIsResetting = (state) => state.settings.isResetting;
 export const selectError = (state) => state.settings.error;

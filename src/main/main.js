@@ -3,6 +3,9 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const Store = require('electron-store');
 
+// Load environment variables from .env file
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+
 const store = new Store();
 
 let mainWindow;
@@ -17,7 +20,11 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      preload: path.join(__dirname, '../preload/preload.js')
+      preload: path.join(__dirname, '../preload/preload.js'),
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false,
+      disableBlinkFeatures: 'Auxclick'
     },
     icon: path.join(__dirname, '../../assets/icon.png'),
     show: false, 
@@ -29,6 +36,14 @@ function createWindow() {
     : `file://${path.join(__dirname, '../../build/index.html')}`;
   
   mainWindow.loadURL(startUrl);
+
+  mainWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+    if (details.url.includes('content_scripts') || details.url.includes('extension://')) {
+      callback({ cancel: true });
+    } else {
+      callback({});
+    }
+  });
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -200,6 +215,56 @@ ipcMain.handle('show-save-dialog', async (event, options) => {
 ipcMain.handle('show-open-dialog', async (event, options) => {
   const result = await dialog.showOpenDialog(mainWindow, options);
   return result;
+});
+
+ipcMain.handle('window-minimize', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+});
+
+ipcMain.handle('window-maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
+ipcMain.handle('window-close', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
+});
+
+ipcMain.handle('window-is-maximized', () => {
+  return mainWindow ? mainWindow.isMaximized() : false;
+});
+
+ipcMain.handle('clipboard-write-text', async (event, text) => {
+  const { clipboard } = require('electron');
+  clipboard.writeText(text);
+});
+
+ipcMain.handle('clipboard-read-text', () => {
+  const { clipboard } = require('electron');
+  return clipboard.readText();
+});
+
+ipcMain.handle('open-dev-tools', () => {
+  if (mainWindow) {
+    mainWindow.webContents.openDevTools();
+  }
+});
+
+ipcMain.handle('is-dev', () => {
+  return isDev;
+});
+
+ipcMain.on('renderer-error', (event, errorInfo) => {
+  console.error('Renderer error:', errorInfo);
 });
 
 app.whenReady().then(() => {

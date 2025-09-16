@@ -6,27 +6,24 @@ import storage from 'redux-persist/lib/storage';
 import appSlice from './slices/appSlice';
 import authSlice from './slices/authSlice';
 import userSlice from './slices/userSlice';
-import nutritionSlice from './slices/nutritionSlice';
-import mealPlanSlice from './slices/mealPlanSlice';
-import recipeSlice from './slices/recipeSlice';
-import healthSlice from './slices/healthSlice';
+
 import settingsSlice from './slices/settingsSlice';
+import notificationSlice from './slices/notificationSlice';
+import accountSwitchSlice from './slices/accountSwitchSlice';
 
 const rootReducer = combineReducers({
   app: appSlice,
   auth: authSlice,
   user: userSlice,
-  nutrition: nutritionSlice,
-  mealPlan: mealPlanSlice,
-  recipe: recipeSlice,
-  health: healthSlice,
-  settings: settingsSlice
+  settings: settingsSlice,
+  notifications: notificationSlice,
+  accountSwitch: accountSwitchSlice
 });
 
 const persistConfig = {
   key: 'nutrihelp-desktop',
   storage,
-  whitelist: ['auth', 'user', 'settings'], 
+  whitelist: ['auth', 'user', 'settings', 'accountSwitch'], 
   blacklist: ['app'] 
 };
 
@@ -62,11 +59,9 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
     './slices/appSlice',
     './slices/authSlice',
     './slices/userSlice',
-    './slices/nutritionSlice',
-    './slices/mealPlanSlice',
-    './slices/recipeSlice',
-    './slices/healthSlice',
-    './slices/settingsSlice'
+    './slices/settingsSlice',
+    './slices/notificationSlice',
+    './slices/accountSwitchSlice'
   ], () => {
     store.replaceReducer(persistReducer(persistConfig, rootReducer));
   });

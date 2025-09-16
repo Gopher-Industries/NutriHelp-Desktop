@@ -102,14 +102,7 @@ const initialState = {
   preferences: {
     units: 'metric', // 'metric' | 'imperial'
     theme: 'light',  // 'light' | 'dark' | 'auto'
-    notifications: {
-      email: true,
-      push: true,
-      mealReminders: true,
-      waterReminders: true,
-      workoutReminders: false,
-      weeklyReports: true,
-    },
+
     privacy: {
       profileVisibility: 'private', // 'public' | 'friends' | 'private'
       shareProgress: false,
