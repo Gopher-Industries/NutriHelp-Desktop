@@ -6,6 +6,7 @@ import storage from 'redux-persist/lib/storage';
 import appSlice from './slices/appSlice';
 import authSlice from './slices/authSlice';
 import userSlice from './slices/userSlice';
+import healthslice from './slices/healthslice';
 
 import settingsSlice from './slices/settingsSlice';
 import notificationSlice from './slices/notificationSlice';
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   app: appSlice,
   auth: authSlice,
   user: userSlice,
+  health: healthslice,
   settings: settingsSlice,
   notifications: notificationSlice,
   accountSwitch: accountSwitchSlice
@@ -23,7 +25,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'nutrihelp-desktop',
   storage,
-  whitelist: ['auth', 'user', 'settings', 'accountSwitch'], 
+  whitelist: ['auth', 'user', 'health', 'settings', 'accountSwitch'], 
   blacklist: ['app'] 
 };
 

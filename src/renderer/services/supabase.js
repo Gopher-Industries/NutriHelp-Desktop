@@ -849,6 +849,189 @@ export const securityService = {
   }
 };
 
+// Health Records service
+export const healthRecordsService = {
+  // Allergies
+  addAllergy: async (allergyData) => {
+    try {
+      const { data, error } = await supabase
+        .from('allergies')
+        .insert([allergyData])
+        .select()
+        .single();
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  removeAllergy: async (allergyId) => {
+    try {
+      const { error } = await supabase
+        .from('allergies')
+        .delete()
+        .eq('id', allergyId);
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  },
+
+  getAllergies: async (userProfileId) => {
+    try {
+      const { data, error } = await supabase
+        .from('allergies')
+        .select('*')
+        .eq('user_profile_id', userProfileId)
+        .order('created_at', { ascending: false });
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  // Medications
+  addMedication: async (medicationData) => {
+    try {
+      const { data, error } = await supabase
+        .from('medications')
+        .insert([medicationData])
+        .select()
+        .single();
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  removeMedication: async (medicationId) => {
+    try {
+      const { error } = await supabase
+        .from('medications')
+        .delete()
+        .eq('id', medicationId);
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  },
+
+  getMedications: async (userProfileId) => {
+    try {
+      const { data, error } = await supabase
+        .from('medications')
+        .select('*')
+        .eq('user_profile_id', userProfileId)
+        .order('created_at', { ascending: false });
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  // Medical Conditions
+  addCondition: async (conditionData) => {
+    try {
+      const { data, error } = await supabase
+        .from('medical_conditions')
+        .insert([conditionData])
+        .select()
+        .single();
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  removeCondition: async (conditionId) => {
+    try {
+      const { error } = await supabase
+        .from('medical_conditions')
+        .delete()
+        .eq('id', conditionId);
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  },
+
+  getConditions: async (userProfileId) => {
+    try {
+      const { data, error } = await supabase
+        .from('medical_conditions')
+        .select('*')
+        .eq('user_profile_id', userProfileId)
+        .order('created_at', { ascending: false });
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  // Family History
+  addFamilyHistory: async (familyHistoryData) => {
+    try {
+      const { data, error } = await supabase
+        .from('family_history')
+        .insert([familyHistoryData])
+        .select()
+        .single();
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  removeFamilyHistory: async (familyHistoryId) => {
+    try {
+      const { error } = await supabase
+        .from('family_history')
+        .delete()
+        .eq('id', familyHistoryId);
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  },
+
+  getFamilyHistory: async (userProfileId) => {
+    try {
+      const { data, error } = await supabase
+        .from('family_history')
+        .select('*')
+        .eq('user_profile_id', userProfileId)
+        .order('created_at', { ascending: false });
+      return { data, error };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+
+  // Get all health records for a user
+  getAllHealthRecords: async (userProfileId) => {
+    try {
+      const [allergiesResult, medicationsResult, conditionsResult, familyHistoryResult] = await Promise.all([
+        healthRecordsService.getAllergies(userProfileId),
+        healthRecordsService.getMedications(userProfileId),
+        healthRecordsService.getConditions(userProfileId),
+        healthRecordsService.getFamilyHistory(userProfileId)
+      ]);
+
+      return {
+        data: {
+          allergies: allergiesResult.data || [],
+          medications: medicationsResult.data || [],
+          conditions: conditionsResult.data || [],
+          familyHistory: familyHistoryResult.data || []
+        },
+        error: allergiesResult.error || medicationsResult.error || conditionsResult.error || familyHistoryResult.error
+      };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+};
+
 export const supabaseService = {
   auth: authService,
   userProfile: userProfileService,
@@ -856,6 +1039,7 @@ export const supabaseService = {
   storage: storageService,
   notification: notificationService,
   security: securityService,
+  healthRecords: healthRecordsService,
   handleError: handleSupabaseError
 };
 

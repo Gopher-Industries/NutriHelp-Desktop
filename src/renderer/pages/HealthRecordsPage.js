@@ -42,6 +42,18 @@ import {
 
 import { supabaseService } from '../services/supabase';
 import {
+  selectVitals,
+  selectMeasurements,
+  selectBloodWork,
+  selectLifestyle,
+  selectGoals,
+  setVitals,
+  setMeasurements,
+  setBloodWork,
+  setLifestyle,
+  setGoals
+} from '../store/slices/healthslice';
+import {
   validateVitals,
   validateMeasurements,
   validateBloodWork,
@@ -80,7 +92,6 @@ const HealthRecordsPage = () => {
   const lifestyle = useSelector(selectLifestyle);
   const goals = useSelector(selectGoals);
   const health = useSelector(state => state.health);
-  const isLoading = useSelector(selectIsLoading);
   const currentUser = useSelector(state => state.auth.user);
   
   const [activeTab, setActiveTab] = useState('vitals');
@@ -95,23 +106,54 @@ const HealthRecordsPage = () => {
 
   useEffect(() => {
     const initializeHealthData = async () => {
-      if (currentUser?.id) {
-        try {
-          const { data: profile } = await supabaseService.userProfile.getProfile(currentUser.id);
-          if (profile) {
-            setUserProfile(profile);
-            dispatch(setUserProfileId(profile.id));
-            dispatch(fetchAllHealthData({ userProfileId: profile.id }));
-          }
-        } catch (error) {
+      // Check if user is authenticated
+      if (!currentUser?.id) {
+        message.warning('Please log in to access your health records');
+        navigate('/login');
+        return;
+      }
+
+      try {
+        const { data: profile, error } = await supabaseService.userProfile.getProfile(currentUser.id);
+        if (error) {
           console.error('Error fetching user profile:', error);
+          if (error.message?.includes('Auth session missing')) {
+            message.warning('Your session has expired. Please log in again.');
+            navigate('/login');
+            return;
+          }
+          message.error('Failed to load user profile');
+          return;
+        }
+        
+        if (profile) {
+          setUserProfile(profile);
+          
+          // Load health records data
+          try {
+            const healthRecordsResult = await supabaseService.healthRecords.getAllHealthRecords(profile.id);
+            if (healthRecordsResult.error) {
+              console.error('Error loading health records:', healthRecordsResult.error);
+            } else {
+              setHealth(healthRecordsResult.data);
+            }
+          } catch (error) {
+            console.error('Error loading health records:', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        if (error.message?.includes('Auth session missing')) {
+          message.warning('Your session has expired. Please log in again.');
+          navigate('/login');
+        } else {
           message.error('Failed to load user profile');
         }
       }
     };
 
     initializeHealthData();
-  }, [dispatch, currentUser, message]);
+  }, [dispatch, currentUser, message, navigate]);
 
   useEffect(() => {
     vitalsForm.setFieldsValue(vitals);
@@ -154,12 +196,7 @@ const HealthRecordsPage = () => {
     goalsForm.setFieldsValue(goals);
   }, [goals, goalsForm]);
 
-  const handleVitalsSubmit = async (values) => {
-    if (!userProfile?.id) {
-      message.error('User profile not found');
-      return;
-    }
-
+  const handleVitalsSubmit = (values) => {
     setSubmitError(null);
     setValidationErrors({});
     
@@ -177,30 +214,19 @@ const HealthRecordsPage = () => {
       weight: values.weight,
       height: values.height,
       bmi: parseFloat(bmi),
-      body_fat: values.bodyFat,
-      muscle_mass: values.muscleMass,
-      water_percentage: values.waterPercentage,
-      bone_density: values.boneDensity,
-      metabolic_age: values.metabolicAge,
-      visceral_fat: values.visceralFat,
+      bodyFat: values.bodyFat,
+      muscleMass: values.muscleMass,
+      waterPercentage: values.waterPercentage,
+      boneDensity: values.boneDensity,
+      metabolicAge: values.metabolicAge,
+      visceralFat: values.visceralFat,
     };
 
-    try {
-      await dispatch(saveVitals({ userProfileId: userProfile.id, vitalsData })).unwrap();
-      message.success('Vital signs updated successfully');
-    } catch (error) {
-      const errorMessage = formatErrorMessage(error);
-      setSubmitError(errorMessage);
-      message.error('Failed to update vital signs: ' + errorMessage);
-    }
+    dispatch(setVitals(vitalsData));
+    message.success('Vital signs updated successfully');
   };
 
-  const handleMeasurementsSubmit = async (values) => {
-    if (!userProfile?.id) {
-      message.error('User profile not found');
-      return;
-    }
-
+  const handleMeasurementsSubmit = (values) => {
     setSubmitError(null);
     setValidationErrors({});
     
@@ -211,22 +237,11 @@ const HealthRecordsPage = () => {
       return;
     }
 
-    try {
-      await dispatch(saveMeasurements({ userProfileId: userProfile.id, measurementsData: values })).unwrap();
-      message.success('Body measurements updated successfully');
-    } catch (error) {
-      const errorMessage = formatErrorMessage(error);
-      setSubmitError(errorMessage);
-      message.error('Failed to update body measurements: ' + errorMessage);
-    }
+    dispatch(setMeasurements(values));
+    message.success('Body measurements updated successfully');
   };
 
-  const handleBloodWorkSubmit = async (values) => {
-    if (!userProfile?.id) {
-      message.error('User profile not found');
-      return;
-    }
-
+  const handleBloodWorkSubmit = (values) => {
     setSubmitError(null);
     setValidationErrors({});
     
@@ -238,44 +253,38 @@ const HealthRecordsPage = () => {
     }
 
     const bloodWorkData = {
-      cholesterol_total: values.cholesterolTotal,
-      cholesterol_ldl: values.cholesterolLdl,
-      cholesterol_hdl: values.cholesterolHdl,
+      cholesterolTotal: values.cholesterolTotal,
+      cholesterolLdl: values.cholesterolLdl,
+      cholesterolHdl: values.cholesterolHdl,
       triglycerides: values.triglycerides,
       glucose: values.glucose,
       hba1c: values.hba1c,
-      systolic_bp: values.systolicBp,
-      diastolic_bp: values.diastolicBp,
-      heart_rate: values.heartRate,
+      systolicBp: values.systolicBp,
+      diastolicBp: values.diastolicBp,
+      heartRate: values.heartRate,
       tsh: values.tsh,
       t3: values.t3,
       t4: values.t4,
-      vitamin_d: values.vitaminD,
-      vitamin_b12: values.vitaminB12,
+      vitaminD: values.vitaminD,
+      vitaminB12: values.vitaminB12,
       iron: values.iron,
       folate: values.folate,
-      test_date: values.testDate ? values.testDate.format('YYYY-MM-DD') : new Date().toISOString().split('T')[0],
-      lab_name: values.labName,
+      testDate: values.testDate ? values.testDate.format('YYYY-MM-DD') : new Date().toISOString().split('T')[0],
+      labName: values.labName,
       notes: values.notes,
     };
     
-    try {
-      await dispatch(saveBloodWork({ userProfileId: userProfile.id, bloodWorkData })).unwrap();
-      message.success('Blood work results updated successfully');
-    } catch (error) {
-      const errorMessage = formatErrorMessage(error);
-      setSubmitError(errorMessage);
-      message.error('Failed to update blood work results: ' + errorMessage);
-    }
+    dispatch(setBloodWork(bloodWorkData));
+    message.success('Blood work results updated successfully');
   };
 
   const handleLifestyleSubmit = (values) => {
-    dispatch(updateLifestyle(values));
+    dispatch(setLifestyle(values));
     message.success('Lifestyle information updated successfully');
   };
 
   const handleGoalsSubmit = (values) => {
-    dispatch(updateGoals(values));
+    dispatch(setGoals(values));
     message.success('Health goals updated successfully');
   };
 
@@ -296,15 +305,18 @@ const HealthRecordsPage = () => {
     }
 
     try {
-      await dispatch(addAllergyAsync({ 
-        userProfileId: userProfile.id, 
-        allergyData: {
-          allergy_name: values.allergyName,
-          severity: values.severity,
-          reaction_description: values.reactionDescription,
-          diagnosed_date: values.diagnosedDate ? values.diagnosedDate.format('YYYY-MM-DD') : null,
-        }
-      })).unwrap();
+      const allergyData = {
+        user_profile_id: userProfile.id,
+        allergy_name: values.allergyName,
+        severity: values.severity,
+        reaction_description: values.reactionDescription,
+        diagnosed_date: values.diagnosedDate ? values.diagnosedDate.format('YYYY-MM-DD') : null,
+      };
+      
+      await supabaseService.healthRecords.addAllergy(allergyData);
+      
+      // Refresh health data
+      await initializeHealthData();
       
       allergyForm.resetFields();
       setAllergyModalVisible(false);
@@ -318,7 +330,11 @@ const HealthRecordsPage = () => {
 
   const handleRemoveAllergy = async (allergyId) => {
     try {
-      await dispatch(removeAllergyAsync({ allergyId })).unwrap();
+      await supabaseService.healthRecords.removeAllergy(allergyId);
+      
+      // Refresh health data
+      await initializeHealthData();
+      
       message.success('Allergy removed successfully');
     } catch (error) {
       message.error('Failed to remove allergy');
@@ -332,19 +348,22 @@ const HealthRecordsPage = () => {
     }
 
     try {
-      await dispatch(addMedicationAsync({ 
-        userProfileId: userProfile.id, 
-        medicationData: {
-          medication_name: values.medicationName,
-          dosage: values.dosage,
-          frequency: values.frequency,
-          start_date: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
-          end_date: values.endDate ? values.endDate.format('YYYY-MM-DD') : null,
-          prescribing_doctor: values.prescribingDoctor,
-          purpose: values.purpose,
-          side_effects: values.sideEffects,
-        }
-      })).unwrap();
+      const medicationData = {
+        user_profile_id: userProfile.id,
+        medication_name: values.medicationName,
+        dosage: values.dosage,
+        frequency: values.frequency,
+        start_date: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
+        end_date: values.endDate ? values.endDate.format('YYYY-MM-DD') : null,
+        prescribing_doctor: values.prescribingDoctor,
+        purpose: values.purpose,
+        side_effects: values.sideEffects,
+      };
+      
+      await supabaseService.healthRecords.addMedication(medicationData);
+      
+      // Refresh health data
+      await initializeHealthData();
       
       medicationForm.resetFields();
       setMedicationModalVisible(false);
@@ -356,7 +375,11 @@ const HealthRecordsPage = () => {
 
   const handleRemoveMedication = async (medicationId) => {
     try {
-      await dispatch(removeMedicationAsync({ medicationId })).unwrap();
+      await supabaseService.healthRecords.removeMedication(medicationId);
+      
+      // Refresh health data
+      await initializeHealthData();
+      
       message.success('Medication removed successfully');
     } catch (error) {
       message.error('Failed to remove medication');
@@ -370,17 +393,20 @@ const HealthRecordsPage = () => {
     }
 
     try {
-      await dispatch(addConditionAsync({ 
-        userProfileId: userProfile.id, 
-        conditionData: {
-          condition_name: values.conditionName,
-          diagnosis_date: values.diagnosisDate ? values.diagnosisDate.format('YYYY-MM-DD') : null,
-          severity: values.severity,
-          status: values.status,
-          treating_doctor: values.treatingDoctor,
-          treatment_notes: values.treatmentNotes,
-        }
-      })).unwrap();
+      const conditionData = {
+        user_profile_id: userProfile.id,
+        condition_name: values.conditionName,
+        diagnosis_date: values.diagnosisDate ? values.diagnosisDate.format('YYYY-MM-DD') : null,
+        severity: values.severity,
+        status: values.status,
+        treating_doctor: values.treatingDoctor,
+        treatment_notes: values.treatmentNotes,
+      };
+      
+      await supabaseService.healthRecords.addCondition(conditionData);
+      
+      // Refresh health data
+      await initializeHealthData();
       
       conditionForm.resetFields();
       setConditionModalVisible(false);
@@ -392,7 +418,11 @@ const HealthRecordsPage = () => {
 
   const handleRemoveCondition = async (conditionId) => {
     try {
-      await dispatch(removeConditionAsync({ conditionId })).unwrap();
+      await supabaseService.healthRecords.removeCondition(conditionId);
+      
+      // Refresh health data
+      await initializeHealthData();
+      
       message.success('Condition removed successfully');
     } catch (error) {
       message.error('Failed to remove condition');
@@ -406,15 +436,18 @@ const HealthRecordsPage = () => {
     }
 
     try {
-      await dispatch(addFamilyHistoryAsync({ 
-        userProfileId: userProfile.id, 
-        familyHistoryData: {
-          relation: values.relation,
-          condition_name: values.conditionName,
-          age_of_onset: values.ageOfOnset,
-          notes: values.notes,
-        }
-      })).unwrap();
+      const familyHistoryData = {
+        user_profile_id: userProfile.id,
+        relation: values.relation,
+        condition_name: values.conditionName,
+        age_of_onset: values.ageOfOnset,
+        notes: values.notes,
+      };
+      
+      await supabaseService.healthRecords.addFamilyHistory(familyHistoryData);
+      
+      // Refresh health data
+      await initializeHealthData();
       
       familyHistoryForm.resetFields();
       setFamilyHistoryModalVisible(false);
@@ -761,7 +794,7 @@ const HealthRecordsPage = () => {
                 </Col>
               </Row>
               <Form.Item style={{ marginTop: '24px' }}>
-                <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isLoading}>
+                <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
                   Save Vital Signs
                 </Button>
               </Form.Item>
@@ -825,7 +858,7 @@ const HealthRecordsPage = () => {
                 </Col>
               </Row>
               <Form.Item style={{ marginTop: '24px' }}>
-                <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isLoading}>
+                <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
                   Save Measurements
                 </Button>
               </Form.Item>
@@ -949,7 +982,7 @@ const HealthRecordsPage = () => {
                 </Col>
               </Row>
               <Form.Item style={{ marginTop: '24px' }}>
-                <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isLoading}>
+                <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
                   Save Blood Work Results
                 </Button>
               </Form.Item>
@@ -1000,7 +1033,7 @@ const HealthRecordsPage = () => {
                 </Col>
               </Row>
               <Form.Item style={{ marginTop: '24px' }}>
-                <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isLoading}>
+                <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
                   Save Lifestyle Information
                 </Button>
               </Form.Item>
@@ -1229,7 +1262,7 @@ const HealthRecordsPage = () => {
                 </Col>
               </Row>
               <Form.Item style={{ marginTop: '24px' }}>
-                <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={isLoading}>
+                <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
                   Save Health Goals
                 </Button>
               </Form.Item>
