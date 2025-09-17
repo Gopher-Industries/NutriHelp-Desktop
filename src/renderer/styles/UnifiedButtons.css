@@ -1,0 +1,233 @@
+/* Unified Button Styles for NutriHelp Desktop */
+/* This file provides consistent button styling across the application */
+
+/* Base Button Styles */
+.unified-btn {
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Primary Button */
+.unified-btn-primary {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.unified-btn-primary:hover {
+  background: linear-gradient(135deg, #096dd9 0%, #0050b3 100%);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+  transform: translateY(-1px);
+  color: white;
+}
+
+.unified-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.3);
+}
+
+/* Secondary Button */
+.unified-btn-secondary {
+  background: #f5f5f5;
+  border: 1px solid #d9d9d9;
+  color: #595959;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.unified-btn-secondary:hover {
+  background: #ffffff;
+  border-color: #40a9ff;
+  color: #1890ff;
+  box-shadow: 0 2px 8px rgba(64, 169, 255, 0.2);
+}
+
+/* Success Button */
+.unified-btn-success {
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(82, 196, 26, 0.3);
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.unified-btn-success:hover {
+  background: linear-gradient(135deg, #389e0d 0%, #237804 100%);
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.4);
+  transform: translateY(-1px);
+  color: white;
+}
+
+/* Warning Button */
+.unified-btn-warning {
+  background: linear-gradient(135deg, #fa8c16 0%, #d46b08 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(250, 140, 22, 0.3);
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.unified-btn-warning:hover {
+  background: linear-gradient(135deg, #d46b08 0%, #ad4e00 100%);
+  box-shadow: 0 4px 12px rgba(250, 140, 22, 0.4);
+  transform: translateY(-1px);
+  color: white;
+}
+
+/* Danger Button */
+.unified-btn-danger {
+  background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.unified-btn-danger:hover {
+  background: linear-gradient(135deg, #cf1322 0%, #a8071a 100%);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+  transform: translateY(-1px);
+  color: white;
+}
+
+/* Large Button Size */
+.unified-btn-large {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Small Button Size */
+.unified-btn-small {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+/* Ghost Button */
+.unified-btn-ghost {
+  background: transparent;
+  border: 1px solid #d9d9d9;
+  color: #595959;
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.unified-btn-ghost:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+/* Disabled State */
+.unified-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.unified-btn:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Icon Button */
+.unified-btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.unified-btn-icon.unified-btn-small {
+  width: 32px;
+  height: 32px;
+}
+
+.unified-btn-icon.unified-btn-large {
+  width: 48px;
+  height: 48px;
+}
+
+/* Loading State */
+.unified-btn-loading {
+  pointer-events: none;
+}
+
+.unified-btn-loading::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: unified-btn-spin 1s linear infinite;
+}
+
+@keyframes unified-btn-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .unified-btn {
+    height: 44px;
+    font-size: 16px;
+  }
+  
+  .unified-btn-large {
+    height: 52px;
+    font-size: 18px;
+  }
+  
+  .unified-btn-small {
+    height: 36px;
+    font-size: 14px;
+  }
+}
+
+/* Focus States for Accessibility */
+.unified-btn:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+.unified-btn-primary:focus {
+  outline-color: #1890ff;
+}
+
+.unified-btn-success:focus {
+  outline-color: #52c41a;
+}
+
+.unified-btn-warning:focus {
+  outline-color: #fa8c16;
+}
+
+.unified-btn-danger:focus {
+  outline-color: #ff4d4f;
+}

@@ -1,0 +1,188 @@
+.admin-notification-page {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+}
+
+.page-header h2 {
+  margin: 0;
+  color: #1890ff;
+}
+
+.statistics-row {
+  margin-bottom: 24px;
+}
+
+.statistics-row .ant-card {
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.statistics-row .ant-statistic-title {
+  font-weight: 500;
+  color: #666;
+}
+
+.statistics-row .ant-statistic-content {
+  color: #1890ff;
+}
+
+.messages-card,
+.read-status-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.messages-card .ant-card-head-title,
+.read-status-card .ant-card-head-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #333;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #f0f9ff;
+}
+
+.ant-tag {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.ant-btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.ant-btn-primary {
+  background: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover {
+  background: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.ant-modal-header {
+  border-radius: 8px 8px 0 0;
+}
+
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+.ant-form-item-label > label {
+  font-weight: 500;
+  color: #333;
+}
+
+.ant-input,
+.ant-select-selector,
+.ant-input-affix-wrapper {
+  border-radius: 6px;
+}
+
+.ant-input:focus,
+.ant-select-focused .ant-select-selector,
+.ant-input-affix-wrapper:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.ant-divider {
+  margin: 16px 0;
+}
+
+.ant-space-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ant-tooltip {
+  max-width: 300px;
+}
+
+.ant-popconfirm {
+  z-index: 1060;
+}
+
+@media (max-width: 768px) {
+  .admin-notification-page {
+    padding: 16px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .statistics-row {
+    margin-bottom: 16px;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-modal {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+  }
+}
+
+@media (max-width: 576px) {
+  .statistics-row .ant-col {
+    margin-bottom: 16px;
+  }
+  
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+  }
+  
+  .ant-space {
+    flex-wrap: wrap;
+  }
+}
+
+.ant-card-head {
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.ant-table-pagination {
+  margin: 16px 0 0 0;
+  text-align: right;
+}
+
+.ant-pagination-item-active {
+  border-color: #1890ff;
+}
+
+.ant-pagination-item-active a {
+  color: #1890ff;
+}
+
+.ant-empty {
+  margin: 32px 0;
+}
+
+.ant-spin-container {
+  min-height: 200px;
+}

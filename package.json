@@ -1,0 +1,176 @@
+{
+  "name": "nutrihelp-desktop",
+  "version": "1.0.0",
+  "description": "Cross-platform desktop dietary assistance application",
+  "main": "src/main/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron-forge start",
+    "dev": "concurrently \"npm run dev:renderer\" \"wait-on http://localhost:3000 && electron .\"",
+    "dev:renderer": "react-scripts start",
+    "build": "react-scripts build",
+    "build:electron": "electron-builder",
+    "dist": "npm run build && electron-builder",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write src/",
+    "make": "electron-forge make",
+    "package": "electron-forge package",
+    "publish": "electron-forge publish"
+  },
+  "keywords": [
+    "nutrition",
+    "health",
+    "diet",
+    "electron",
+    "desktop",
+    "cross-platform"
+  ],
+  "author": "NutriHelp Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "@electron-forge/maker-wix": "^7.9.0",
+    "@electron-forge/maker-zip": "^7.2.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+    "@electron-forge/plugin-fuses": "^7.2.0",
+    "@electron/fuses": "^1.5.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "concurrently": "^7.6.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "eslint": "^8.0.0",
+    "eslint-config-react-app": "^7.0.1",
+    "prettier": "^2.8.0",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.0.0",
+    "@react-three/fiber": "^8.15.19",
+    "@reduxjs/toolkit": "^2.8.2",
+    "@supabase/supabase-js": "^2.53.0",
+    "antd": "^5.26.7",
+    "axios": "^1.6.2",
+    "chart.js": "^4.4.1",
+    "date-fns": "^2.30.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^17.2.1",
+    "electron-is-dev": "^2.0.0",
+    "electron-store": "^8.1.0",
+    "framer-motion": "^12.23.12",
+    "moment": "^2.30.1",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^6.30.1",
+    "react-scripts": "^5.0.1",
+    "react-transition-group": "^4.4.5",
+    "redux-persist": "^6.0.0",
+    "styled-components": "^6.1.6",
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
+  },
+  "overrides": {
+    "nth-check": "^2.0.1",
+    "postcss": "^8.4.31",
+    "webpack-dev-server": "^4.15.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.17"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "build": {
+    "appId": "com.nutrihelp.desktop",
+    "productName": "NutriHelp Desktop",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "src/main/**/*",
+      "src/preload/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.healthcare-fitness"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "forge": {
+    "packagerConfig": {
+      "asar": true
+    },
+    "makers": [
+      {
+        "name": "@electron-forge/maker-wix",
+        "config": {
+          "name": "NutriHelp Desktop",
+          "manufacturer": "NutriHelp Team"
+        },
+        "platforms": [
+          "win32"
+        ]
+      },
+      {
+        "name": "@electron-forge/maker-zip",
+        "platforms": [
+          "darwin"
+        ]
+      },
+      {
+        "name": "@electron-forge/maker-deb",
+        "config": {},
+        "platforms": [
+          "linux"
+        ]
+      },
+      {
+        "name": "@electron-forge/maker-rpm",
+        "config": {},
+        "platforms": [
+          "linux"
+        ]
+      }
+    ],
+    "plugins": [
+      {
+        "name": "@electron-forge/plugin-auto-unpack-natives",
+        "config": {}
+      },
+      {
+        "name": "@electron-forge/plugin-fuses",
+        "config": {
+          "version": "1.5.0",
+          "resetAdHocDarwinSignature": true,
+          "enableCookieEncryption": true,
+          "enableNodeOptionsEnvironmentVariable": false,
+          "enableNodeCliInspectArguments": false,
+          "enableEmbeddedAsarIntegrityValidation": true,
+          "onlyLoadAppFromAsar": true
+        }
+      }
+    ]
+  }
+}

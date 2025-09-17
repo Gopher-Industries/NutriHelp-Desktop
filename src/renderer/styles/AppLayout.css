@@ -1,0 +1,324 @@
+/* Modern Sidebar Styles */
+.app-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+}
+
+/* Sidebar Styles */
+.app-layout .ant-layout-sider {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(26, 26, 26, 0.95) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3) !important;
+  position: relative;
+  z-index: 100;
+}
+
+.app-layout .ant-layout-sider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Logo Area */
+.sidebar-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.sidebar-logo::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.logo-collapsed {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.logo-collapsed:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 32px rgba(255, 255, 255, 0.4);
+}
+
+.logo-expanded {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.logo-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(255, 255, 255, 0.4);
+}
+
+.logo-text {
+  color: #ffffff !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-letter {
+  color: #000000 !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+}
+
+/* Menu Styles */
+.app-layout .ant-menu {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.app-layout .ant-menu-item {
+  background: transparent !important;
+  border-radius: 12px !important;
+  margin: 4px 12px !important;
+  padding: 0 16px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-layout .ant-menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.app-layout .ant-menu-item:hover::before {
+  left: 100%;
+}
+
+.app-layout .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  transform: translateX(8px);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
+}
+
+.app-layout .ant-menu-item-selected {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2) !important;
+}
+
+.app-layout .ant-menu-item-selected::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.app-layout .ant-menu-item .anticon {
+  font-size: 18px !important;
+  color: inherit !important;
+  transition: all 0.3s ease;
+}
+
+.app-layout .ant-menu-item:hover .anticon {
+  transform: scale(1.1);
+}
+
+.app-layout .ant-menu-item-selected .anticon {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Header Styles */
+.app-layout .ant-layout-header {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+
+.header-toggle-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.header-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1) !important;
+}
+
+.header-toggle-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05) !important;
+}
+
+.header-title {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+
+.header-user-section {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(10px);
+}
+
+.header-user-section:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.header-user-name {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.header-user-email {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Content Area */
+.app-layout .ant-layout-content {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  min-height: calc(100vh - 64px);
+  position: relative;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-layout .ant-layout-sider {
+    position: fixed !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
+  }
+  
+  .app-layout .ant-layout-header {
+    padding: 0 16px !important;
+  }
+  
+  .header-user-section .ant-typography {
+    display: none !important;
+  }
+}
+
+/* Animation for sidebar collapse */
+.app-layout .ant-layout-sider {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.app-layout .ant-layout-sider-collapsed .sidebar-logo {
+  padding: 0 !important;
+}
+
+/* Badge styles for menu items */
+.app-layout .ant-badge {
+  color: inherit !important;
+}
+
+.app-layout .ant-badge-count {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%) !important;
+  color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Avatar styles */
+.header-user-section .ant-avatar {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%) !important;
+  color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Scrollbar for menu */
+.app-layout .ant-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.app-layout .ant-menu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+}
+
+.app-layout .ant-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.app-layout .ant-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

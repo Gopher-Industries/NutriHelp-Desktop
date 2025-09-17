@@ -1,0 +1,247 @@
+/* Login Page Styles */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f9fc;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  overflow: hidden;
+  min-height: 600px;
+}
+
+
+
+.login-content {
+  flex: 1;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-company-logo-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.login-company-logo {
+  width: 280px;
+  height: 100px;
+}
+
+.login-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.login-subtitle {
+  color: #666;
+  font-size: 16px;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+.login-form {
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 16px;
+  padding: 0 16px;
+}
+
+.form-input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 24px 0;
+}
+
+.remember-checkbox {
+  font-size: 14px;
+  color: #666;
+}
+
+.forgot-password-link {
+  color: #8b5cf6;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.forgot-password-link:hover {
+  color: #7c3aed;
+  text-decoration: underline;
+}
+
+.login-button {
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+}
+
+.login-button:hover {
+  background: linear-gradient(135deg, #096dd9 0%, #0050b3 100%);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+  transform: translateY(-1px);
+  color: white;
+}
+
+.login-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.3);
+}
+
+.signup-section {
+  text-align: center;
+}
+
+.signup-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.signup-link {
+  color: #8b5cf6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signup-link:hover {
+  color: #7c3aed;
+  text-decoration: underline;
+}
+
+.login-illustration {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 40px;
+}
+
+.decoration-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+  
+  .login-card {
+    max-width: 100%;
+    padding: 40px 24px;
+  }
+  
+  .login-illustration {
+    min-height: 200px;
+  }
+  
+  .login-title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 20px;
+  }
+  
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .login-title {
+    font-size: 24px;
+  }
+}
+
+/* Ant Design overrides */
+.ant-form-item {
+  margin-bottom: 0;
+}
+
+.ant-form-item-explain-error {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.ant-checkbox-wrapper {
+  font-size: 14px;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #8b5cf6;
+  border-color: #8b5cf6;
+}
+
+.ant-checkbox:hover .ant-checkbox-inner {
+  border-color: #8b5cf6;
+}
+
+.ant-input-password .ant-input {
+  padding-right: 40px;
+}
+
+.ant-input-password-icon {
+  color: #999;
+}
